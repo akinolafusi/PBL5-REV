@@ -1,0 +1,5 @@
+[server]
+3.86.45.14 ansible_ssh_user="ubuntu" ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[client]
+44.206.244.131 ansible_ssh_user="ubuntu" ansible_ssh_common_args='-o StrictHostKeyChecking=no'

@@ -1,0 +1,74 @@
+- name: set up mysql server
+  hosts: server
+  become: true
+  become_user: root
+  tasks:
+    - name: update cache
+      apt:
+        update_cache: yes
+    - name: Installing Mysql  and dependencies
+      package:
+       name: "{{item}}"
+       state: present
+       update_cache: yes
+      loop:
+       - mysql-server 
+       - python3-mysqldb
+       - libmysqlclient-dev
+      become: true
+
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Enable remote login to mysql
+      lineinfile:
+         path: /etc/mysql/mysql.conf.d/mysqld.cnf
+         regexp: '^bind-address'
+         line: '#bind-address = 0.0.0.0'
+         backup: yes
+
+    - name: create User
+      mysql_user:
+        name: myuser
+        host: '172.31.91.82'
+        password: mypass
+        priv: '*.*:ALL,GRANT'
+        state: present
+      become: true
+
+    - name: create database
+      mysql_db:
+        name: toolingdb
+        state: present
+      
+    - name: Allow mysql
+      become: true
+      shell: ufw allow mysql
+
+    - name: enable ufw
+      become: true
+      shell: systemctl enable ufw
+
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: restarted
+   
+
+
+
+- name: set up mysql client
+  hosts: client
+  become: true
+  become_user: root
+  tasks:
+    - name: update cache
+      apt:
+        update_cache: yes
+    - name: install mysql client
+      apt:
+        name: mysql-client
+        state: present
