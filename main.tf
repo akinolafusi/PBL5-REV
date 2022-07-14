@@ -1,33 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_security_group" "projectSG" {
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    name = "ProjectSG"
-  }
-}
 
 # resource "aws_key_pair" "deployer" {
 #   key_name   = "UBUNTU2.pem"
@@ -37,12 +7,25 @@ resource "aws_security_group" "projectSG" {
 
 resource "aws_instance" "projectone" {
   ami             = "ami-052efd3df9dad4825"
+  count = 2
   instance_type   = "t2.micro"
   vpc_security_group_ids = ["${aws_security_group.projectSG.id}"]
   key_name        = "UBUNTU2"
   tags = { 
 
-    Name = "PROJECT4"
+    Name = "PROJECT4 ${count.index}"
 
   }
 }
+
+# resource "aws_instance" "projectone" {
+#   ami             = "ami-052efd3df9dad4825"
+#   instance_type   = "t2.micro"
+#   vpc_security_group_ids = ["${aws_security_group.projectSG.id}"]
+#   key_name        = "UBUNTU2"
+#   tags = { 
+
+#     Name = "PROJECT4"
+
+#   }
+# }
